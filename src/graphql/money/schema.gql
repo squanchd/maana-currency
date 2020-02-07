@@ -1,0 +1,56 @@
+# Scalars
+scalar Date
+scalar JSON
+
+# Boilerplate
+type Info {
+  id: ID!
+  name: String!
+  description: String
+}
+
+type Currency {
+  id: ID!
+}
+
+input CurrencyInput {
+  id: ID!
+}
+
+type CurrencyValue {
+  id: ID!
+  currency: Currency!
+  value: Float
+}
+
+input CurrencyValueInput {
+  id: ID!
+  currency: CurrencyInput!
+  value: Float
+}
+
+# Query Root
+type Query {
+  # Boilerplate
+  info: Info
+  constructCurrencyValue(value: Float, currency: CurrencyInput): CurrencyValue
+}
+
+type Mutation {
+  convertFloat(
+    value: Float!
+    from: CurrencyInput!
+    to: CurrencyInput!
+  ): CurrencyValue!
+  convertCurrencyValue(
+    from: CurrencyValueInput!
+    to: CurrencyInput!
+  ): CurrencyValue!
+  getAllCurrencyRates: [CurrencyValue!]!
+  getAllCurrencyRatesWithBase(base: CurrencyInput): [CurrencyValue!]!
+  getCurrencyRate(currency: CurrencyInput!): CurrencyValue!
+  getCurrencyRateWithBase(
+    currency: CurrencyInput!
+    base: CurrencyInput!
+  ): CurrencyValue!
+}
