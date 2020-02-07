@@ -57,7 +57,7 @@ export const resolver = {
     }
   },
   Mutation: {
-    convertFloat: async (_, { value, from, to }, { client }) => {
+    convertFloat: async (_, { value, from, to, base }, { client }) => {
       const rates = await exchangeRates()
         .latest()
         .fetch()
@@ -65,11 +65,11 @@ export const resolver = {
       const result = convert(value, {
         from: from.id,
         to: to.id,
-        base: 'USD',
+        base: base || 'USD',
         rates
       })
       return {
-        id: `${result.toString()}-${to.id}`,
+        id: `${to.id}-${result.toString()}`,
         currency: {
           id: `${to.id}`
         },
@@ -77,7 +77,7 @@ export const resolver = {
       }
     },
 
-    convertCurrencyValue: async (_, { from, to }, { client }) => {
+    convertCurrencyValue: async (_, { from, to, base }, { client }) => {
       const rates = await exchangeRates()
         .latest()
         .fetch()
@@ -85,11 +85,11 @@ export const resolver = {
       const result = convert(from.value, {
         from: from.id,
         to: to.id,
-        base: 'USD',
+        base: base || 'USD',
         rates
       })
       return {
-        id: `${result.toString()}-${to.id}`,
+        id: `${to.id}-${result.toString()}`,
         currency: {
           id: `${to.id}`
         },
@@ -104,7 +104,7 @@ export const resolver = {
       return Object.keys(rates).map(key => {
         const val = rates[key]
         return {
-          id: `${val}-${key}`,
+          id: `${key}-${val}`,
           currency: {
             id: `${key}`
           },
@@ -122,7 +122,7 @@ export const resolver = {
       return Object.keys(rates).map(key => {
         const val = rates[key]
         return {
-          id: `${val}-${key}`,
+          id: `${key}-${val}`,
           currency: {
             id: `${key}`
           },
@@ -139,7 +139,7 @@ export const resolver = {
         Object.keys(rates).map(key => {
           const val = rates[key]
           return {
-            id: `${val}-${key}`,
+            id: `${key}-${val}`,
             currency: {
               id: `${key}`
             },
@@ -158,7 +158,7 @@ export const resolver = {
         Object.keys(rates).map(key => {
           const val = rates[key]
           return {
-            id: `${val}-${key}`,
+            id: `${key}-${val}`,
             currency: {
               id: `${key}`
             },
