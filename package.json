@@ -2,7 +2,7 @@
   "name": "maana-my-service",
   "author": "Maana, Inc.",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Maana Q Knowledge Service Template",
   "main": "src/start.js",
   "repository": "git@github.com:maana-io/q-svc-templates.git",
