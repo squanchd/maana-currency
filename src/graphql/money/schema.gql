@@ -41,10 +41,12 @@ type Mutation {
     value: Float!
     from: CurrencyInput!
     to: CurrencyInput!
+    base: CurrencyInput
   ): CurrencyValue!
   convertCurrencyValue(
     from: CurrencyValueInput!
     to: CurrencyInput!
+    base: CurrencyInput
   ): CurrencyValue!
   getAllCurrencyRates: [CurrencyValue!]!
   getAllCurrencyRatesWithBase(base: CurrencyInput): [CurrencyValue!]!
