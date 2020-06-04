@@ -24,6 +24,9 @@ import { makeExecutableSchema } from 'graphql-tools'
 import path from 'path'
 import querystring from 'querystring'
 import request from 'request-promise-native'
+import middleware from './middleware' // returns array of middelware
+import { applyMiddleware } from 'graphql-middleware'
+
 
 // load .env into process.env.*
 require('dotenv').config()
@@ -40,10 +43,13 @@ const schemaPath = path.join(
 const glueRes = glue(schemaPath, options)
 
 // Compile schema
-export const schema = makeExecutableSchema({
-  typeDefs: glueRes.schema,
-  resolvers: glueRes.resolver
-})
+export const schema = applyMiddleware(
+  makeExecutableSchema({
+    typeDefs: glueRes.schema,
+    resolvers: glueRes.resolver
+  }),
+  ...middleware
+)
 
 //
 // Client setup
@@ -117,11 +123,19 @@ const initServer = async options => {
 
   const socketMiddleware = socketAuthMiddleware || defaultSocketMiddleware
 
+  const schemaWithMiddleware = applyMiddleware(schema, ...middleware)
+
   const server = new ApolloServer({
-    schema,
+    schema: schemaWithMiddleware,
+    tracing: true,
+    introspection: true,
+    playground: {
+      endpoint: '/maana-money-js/graphql'
+    },
     subscriptions: {
       onConnect: socketMiddleware
     },
+
     context: async ({ req }) => {
       return {
         client
@@ -130,7 +144,8 @@ const initServer = async options => {
   })
 
   server.applyMiddleware({
-    app
+    app,
+    path: '/maana-money-js/graphql'
   })
 
   const httpServer = http.createServer(app)
@@ -138,7 +153,9 @@ const initServer = async options => {
 
   httpServer.listen({ port: PORT }, async () => {
     log(SELF).info(
-      `listening on ${print.external(`http://${HOSTNAME}:${PORT}/graphql`)}`
+      `listening on ${print.external(
+        `http://${HOSTNAME}:${PORT}/${SELF}/graphql`
+      )}`
     )
 
     // Create OIDC token URL for the specified auth provider (default to auth0).
