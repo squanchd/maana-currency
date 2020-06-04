@@ -27,8 +27,9 @@ jobs:
     - uses: Azure/docker-login@v1
       with:
         login-server: docker.pkg.github.com
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        password: ${{ secrets.GITHUB_TOKEN }}
         username: ${{ secrets.REGISTRY_USERNAME }}        
+  
     - uses: azure/aks-set-context@v1
       with:
           creds: '${{ secrets.ROIE_DEV_AZURE }}' # Azure credentials
