@@ -18,24 +18,23 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+  
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-
-    - uses: azure/aks-set-context@v1
-      with:
-          creds: '${{ secrets.ROIE_DEV_AZURE }}' # Azure credentials
-          resource-group: '${{ secrets.AZURE_RESOURCE_GROUP }}'
-          cluster-name: '${{ secrets.AZURE_KUBERNETES_CLUSTER }}'
-      id: login
     
     - uses: Azure/docker-login@v1
       with:
         login-server: docker.pkg.github.com
         password: ${{ secrets.REGISTRY_PASSWORD }}
         username: ${{ secrets.REGISTRY_USERNAME }}        
+    - uses: azure/aks-set-context@v1
+      with:
+          creds: '${{ secrets.ROIE_DEV_AZURE }}' # Azure credentials
+          resource-group: '${{ secrets.AZURE_RESOURCE_GROUP }}'
+          cluster-name: '${{ secrets.AZURE_KUBERNETES_CLUSTER }}'
+      id: login    
     
     - run: |
         docker build . -t docker.pkg.github.com/maana-currency:${{ github.sha }}
