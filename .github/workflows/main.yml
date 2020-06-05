@@ -38,8 +38,8 @@ jobs:
       id: login    
     
     - run: |
-        docker build . -t docker.pkg.github.com/maana-currency:${{ github.sha }}
-        docker push docker.pkg.github.com/maana-currency:${{ github.sha }}
+        docker build . -t docker.pkg.github.com/maana-io/maana-currency/maana-currency-built:${{ github.sha }}
+        docker push docker.pkg.github.com/maana-io/maana-currency/maana-currency-built:${{ github.sha }}
       
 #     - uses: Azure/k8s-set-context@v1
 #       with:
@@ -62,6 +62,6 @@ jobs:
       with:
         manifests: ${{ steps.bake.outputs.manifestsBundle }}
         images: |
-          docker.pkg.github.com/maana-currency:${{ github.sha }}
+          docker.pkg.github.com/maana-io/maana-currency/maana-currency-built:${{ github.sha }}
         imagepullsecrets: |
           demo-k8s-secret
