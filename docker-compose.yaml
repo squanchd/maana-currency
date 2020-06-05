@@ -1,8 +1,7 @@
 version: '3.1'
 services:
   maana-currency:
-    env_file: .env
-    build: .
+    image: ${DOCKER_REGISTRY}/${APPLICATION_NAME}:${VERSION_TAG}
     restart: always
     ports:
       - ${EXPOSED_PORT}:${EXPOSED_PORT}
