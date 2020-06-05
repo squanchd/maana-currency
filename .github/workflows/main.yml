@@ -49,7 +49,7 @@ jobs:
       with:
         container-registry-url: docker.pkg.github.com
         container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
-        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        container-registry-password: ${{ secrets.GITHUB_TOKEN }}
         secret-name: demo-k8s-secret
 
     - uses: azure/k8s-bake@v1
