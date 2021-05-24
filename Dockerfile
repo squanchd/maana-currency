@@ -1,25 +1,48 @@
-FROM node:alpine
+# By default, use node 14.15.3 as the base image
+ARG IMAGE=node@sha256:bef791f512bb4c3051a1210d7fbd58206538f41eea9b966031abc8a7453308fe
 
-RUN apk --no-cache add --virtual native-deps \
-  g++ gcc libgcc libstdc++ linux-headers autoconf automake make nasm python git && \
-  npm install --quiet node-gyp -g
+FROM $IMAGE
 
-WORKDIR /usr/src/app
+# Define how verbose should npm install be
+ARG NPM_LOG_LEVEL=silent
+# Hide Open Collective message from install logs
+ENV OPENCOLLECTIVE_HIDE=1
+# Hiden NPM security message from install logs
+ENV NPM_CONFIG_AUDIT=false
+# Hide NPM funding message from install logs
+ENV NPM_CONFIG_FUND=false
 
-COPY package*.json ./
+# Update npm to version 7
+RUN npm i -g npm@7.3.0
 
-RUN npm set progress=false && \
-  npm i --silent
+# Set the working direcotry
+WORKDIR /app
 
-RUN apk del native-deps
+# Copy files specifiying dependencies
+COPY server/package.json server/package-lock.json ./server/
+COPY admin-ui/package.json admin-ui/package-lock.json ./admin-ui/
 
-COPY package.json ./
+# Install dependencies
+RUN cd server; npm ci --loglevel=$NPM_LOG_LEVEL;
+RUN cd admin-ui; npm ci --loglevel=$NPM_LOG_LEVEL;
 
-RUN npm install
-RUN npm build
+# Copy Prisma schema
+COPY server/prisma/schema.prisma ./server/prisma/
 
-COPY . ./
+# Generate Prisma client
+RUN cd server; npm run prisma:generate;
 
-CMD npm start
+# Copy all the files
+COPY . .
 
-EXPOSE 8050
+# Build code
+RUN set -e; (cd server; npm run build) & (cd admin-ui; npm run build)
+
+# Expose the port the server listens to
+EXPOSE 3000
+
+# Make server to serve admin built files
+ENV SERVE_STATIC_ROOT_PATH=admin-ui/build
+
+# Run server
+CMD [ "node", "server/dist/main"]
